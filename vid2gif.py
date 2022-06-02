@@ -1,6 +1,6 @@
 import glob
 import cv2
-import os
+import sys
 
 from PIL import Image
 
@@ -22,11 +22,9 @@ def get_frames():
     return fps
 
 
-def to_gif(fps):
+def to_gif(fps, fp_in, fp_out):
     # filepaths
-
-
-    fp_in = "./assets/images/frame*.png"
+    fp_in = fp_in + "frame*.png"
     fp_out = "./assets/out/image.gif"
 
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
@@ -38,5 +36,7 @@ def to_gif(fps):
 
 
 if __name__ == '__main__':
+    fin = sys.argv[1]
+    fout = sys.argv[2]
     fps = get_frames()
-    to_gif(fps)
+    to_gif(fps, fin, fout)
