@@ -1,8 +1,9 @@
 <<<<<<< HEAD
 assets/
-out.gif
-test3.mp4
+*.gif
+*.mp4
 *.xml
+.idea/
 =======
 # Default ignored files
 /shelf/
