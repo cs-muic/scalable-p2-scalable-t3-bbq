@@ -2,6 +2,7 @@
 assets/
 out.gif
 test3.mp4
+*.xml
 =======
 # Default ignored files
 /shelf/
