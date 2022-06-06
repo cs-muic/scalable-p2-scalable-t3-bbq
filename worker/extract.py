@@ -17,8 +17,15 @@ MINIO_API_HOST = "http://localhost:9000"
 
 MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
+# generate bucket of videos
+found = MINIO_CLIENT.bucket_exists("videos")
+if not found:
+    MINIO_CLIENT.make_bucket("videos")
+
 
 def get_frames(fp_in):
+
+    # generate bucket of frames extracted
     s = 10  # number of characters in the string.
     randstr = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
     found = MINIO_CLIENT.bucket_exists(randstr)
@@ -26,7 +33,8 @@ def get_frames(fp_in):
         MINIO_CLIENT.make_bucket(randstr)
     else:
         print("Bucket already exists")
-    MINIO_CLIENT.fput_object(randstr, object_name="video.mp4", file_path=fp_in)
+
+    MINIO_CLIENT.fput_object("videos", object_name=os.path.basename(fp_in), file_path=fp_in)
     vidcap = cv2.VideoCapture(fp_in)
     # fps = vidcap.get(cv2.CAP_PROP_FPS)
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
