@@ -1,9 +1,10 @@
 <<<<<<< HEAD
-assets/
+images/
 *.gif
 *.mp4
 *.xml
 .idea/
+minio/
 =======
 # Default ignored files
 /shelf/
