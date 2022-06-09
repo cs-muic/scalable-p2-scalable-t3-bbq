@@ -7,6 +7,12 @@ import os
 from minio import Minio
 from dotenv import load_dotenv
 
+from celery import Celery
+
+BROKER_URL = 'redis://localhost:6379/0'
+
+celery_app = Celery('Extract', broker=BROKER_URL)
+
 load_dotenv()
 
 LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
@@ -23,8 +29,8 @@ if not found:
     MINIO_CLIENT.make_bucket("videos")
 
 
+@celery_app.task
 def get_frames(fp_in):
-
     # generate bucket of frames extracted
     s = 10  # number of characters in the string.
     randstr = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
@@ -35,6 +41,7 @@ def get_frames(fp_in):
         print("Bucket already exists")
 
     MINIO_CLIENT.fput_object("videos", object_name=os.path.basename(fp_in), file_path=fp_in)
+    os.mkdir("images")
     vidcap = cv2.VideoCapture(fp_in)
     # fps = vidcap.get(cv2.CAP_PROP_FPS)
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -43,15 +50,17 @@ def get_frames(fp_in):
     while success:
         if 1 / 3 * length < count < 1 / 3 * length + 15 * 15:
             frame = imutils.resize(image, width=480)
-            cv2.imwrite("../images/frame%d.png" % count, frame)
+            cv2.imwrite("images/frame%d.png" % count, frame)
             MINIO_CLIENT.fput_object(randstr, object_name="frame%d.png" % count,
-                                     file_path="../images/frame%d.png" % count)
+                                     file_path="images/frame%d.png" % count, content_type="image/png")
             try:
-                os.remove("../images/frame%d.png" % count)
+                os.remove("images/frame%d.png" % count)
             except:
                 pass
         success, image = vidcap.read()
         count += 1
+
+    os.rmdir("images")
 
     return print("Successfully uploaded all frames to bucket")
 
