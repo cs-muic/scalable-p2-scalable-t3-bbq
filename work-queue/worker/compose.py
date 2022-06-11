@@ -42,7 +42,7 @@ def to_gif(bucket_name):
 
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
 
-    # os.mkdir(bucket_name)
+    os.mkdir(bucket_name)
     for obj in frames:
         fp = bucket_name + "/" + obj.object_name
         MINIO_CLIENT.fget_object(bucket_name=bucket_name, object_name=obj.object_name, file_path=fp)
@@ -53,17 +53,17 @@ def to_gif(bucket_name):
     img = next(imgs)  # extract first image from iterator
 
     s = 10
-    fp_out = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
+    fp_out = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s)) + '.gif'
 
     img.save(fp=fp_out, format='GIF', append_images=imgs,
              save_all=True, duration=1 / 15, loop=0)
 
-    MINIO_CLIENT.fput_object("gif", object_name=fp_out, file_path=fp_out, content_type="image/gif")
+    MINIO_CLIENT.fput_object(bucket_name="gif", object_name=fp_out, file_path="./" + fp_out, content_type="image/gif")
 
     os.remove(fp_out)
     shutil.rmtree(bucket_name)
 
-    print("Video Thumbnail Created!!!")
+    return "Video Thumbnail Created!!!"
 
 
 # if __name__ == '__main__':
