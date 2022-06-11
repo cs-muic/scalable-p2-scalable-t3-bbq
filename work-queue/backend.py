@@ -1,5 +1,4 @@
-from flask import jsonify, request, Flask
-import json
+from flask import Flask
 from wq_service import *
 
 app = Flask(__name__)
