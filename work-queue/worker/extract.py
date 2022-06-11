@@ -9,9 +9,10 @@ from dotenv import load_dotenv
 
 from celery import Celery
 
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = "redis://localhost:6378"
 
-celery_app = Celery('Extract', broker=BROKER_URL)
+celery_app = Celery('compose', broker='redis://localhost:6378/0',
+                    result_backend='db+postgresql://dbc:dbc@localhost:5434/celery')
 
 load_dotenv()
 

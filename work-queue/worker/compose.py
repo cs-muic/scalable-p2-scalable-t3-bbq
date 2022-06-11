@@ -7,9 +7,13 @@ import os
 from celery import Celery
 import shutil
 
-BROKER_URL = 'redis://localhost:6379'
+BROKER_URL = 'redis://localhost:6378'
 
-celery_app = Celery('Extract', broker=BROKER_URL)
+
+celery_app = Celery('compose', broker=BROKER_URL, result_backend='db+postgresql://dbc:dbc@localhost:5434/celery')
+
+res_backend = os.environ.get("CELERY_RESULT_BACKEND",
+                             "db+mariadb://dbc:dbc@localhost:5434/celery")
 
 load_dotenv()
 
