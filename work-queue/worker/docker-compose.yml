@@ -1,5 +1,21 @@
 version: "3"
 services:
+    minio:
+        image: minio/minio
+        command: server /data --console-address ":9001"
+        hostname: minio-name
+        ports:
+          - "9000:9000"
+          - "9001:9001"
+        environment:
+           MINIO_ACCESS_KEY: admin
+           MINIO_SECRET_KEY: password
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+          interval: 30s
+          timeout: 20s
+          retries: 3
+
     broker:
         image: redis:latest
         container_name: demo_broker
@@ -25,9 +41,13 @@ services:
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
         depends_on:
           - broker
           - backend
+          - minio
 
     worker_02:
         build: .
@@ -38,6 +58,10 @@ services:
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
         depends_on:
           - broker
           - backend
+          - minio

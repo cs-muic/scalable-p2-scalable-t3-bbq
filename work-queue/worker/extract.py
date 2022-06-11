@@ -9,10 +9,16 @@ from dotenv import load_dotenv
 
 from celery import Celery
 
-BROKER_URL = "redis://localhost:6378"
+# BROKER_URL = "redis://localhost:6378"
+# RES_BACKEND = "db+postgresql://postgres:dbc@localhost:5434/celery"
 
-celery_app = Celery('compose', broker='redis://localhost:6378/0',
-                    backend='db+postgresql://dbc:dbc@localhost:5434/celery')
+BROKER_URL = os.environ.get("CELERY_BROKER_URL",
+                            "redis://localhost:6378/0"),
+RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
+                             "db+postgresql://dbc:dbc@localhost:5434/celery")
+
+celery_app = Celery('extract', broker=BROKER_URL,
+                    backend=RES_BACKEND)
 
 load_dotenv()
 
@@ -21,8 +27,9 @@ ACCESS_KEY = os.environ.get('ACCESS_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 MINIO_API_HOST = "http://localhost:9000"
+MINIO_URL = os.environ.get("MINIO_URL")
 
-MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
 # generate bucket of videos
 found = MINIO_CLIENT.bucket_exists("videos")
@@ -62,8 +69,8 @@ def get_frames(fp_in):
         count += 1
 
     os.rmdir("images")
-
-    return print("Successfully uploaded all frames to bucket")
+    print("Successfully uploaded all frames to bucket")
+    return randstr
 
 
 if __name__ == '__main__':

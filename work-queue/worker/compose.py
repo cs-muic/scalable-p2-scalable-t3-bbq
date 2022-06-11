@@ -7,13 +7,12 @@ import os
 from celery import Celery
 import shutil
 
-BROKER_URL = 'redis://localhost:6378'
+BROKER_URL = os.environ.get("CELERY_BROKER_URL",
+                            "redis://localhost:6378/0"),
+RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
+                             "db+postgresql://dbc:dbc@localhost:5434/celery")
 
-
-celery_app = Celery('compose', broker=BROKER_URL, backend='db+postgresql://dbc:dbc@localhost:5434/celery')
-
-res_backend = os.environ.get("CELERY_RESULT_BACKEND",
-                             "db+mariadb://dbc:dbc@localhost:5434/celery")
+celery_app = Celery('compose', broker=BROKER_URL, backend=RES_BACKEND)
 
 load_dotenv()
 
@@ -21,9 +20,12 @@ LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
 ACCESS_KEY = os.environ.get('ACCESS_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-MINIO_API_HOST = "http://localhost:9000"
+# MINIO_API_HOST = "http://localhost:9000"
 
-MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+MINIO_URL = os.environ.get("MINIO_URL")
+
+# MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
 # generate bucket of GIF
 found = MINIO_CLIENT.bucket_exists("gif")

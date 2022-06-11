@@ -1,5 +1,6 @@
 version: "3"
 services:
+
     broker:
         image: redis:latest
         container_name: demo_broker
@@ -17,7 +18,7 @@ services:
           - POSTGRES_DB=celery
 
     worker_01:
-        build: ..
+        build: .
         container_name: demo_worker_01
         command: celery --app=tasks.celery_app worker --loglevel=info --queues q01
         volumes:
@@ -30,7 +31,7 @@ services:
           - backend
 
     worker_02:
-        build: ..
+        build: .
         container_name: demo_worker_02
         command: celery --app=tasks.celery_app worker --loglevel=info --queues q02
         volumes:

@@ -10,6 +10,7 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
+COPY ./test3.mp4 .
 RUN pip install -r requirements.txt
 
 
