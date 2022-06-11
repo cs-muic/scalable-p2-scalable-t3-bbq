@@ -10,7 +10,7 @@ import shutil
 BROKER_URL = 'redis://localhost:6378'
 
 
-celery_app = Celery('compose', broker=BROKER_URL, result_backend='db+postgresql://dbc:dbc@localhost:5434/celery')
+celery_app = Celery('compose', broker=BROKER_URL, backend='db+postgresql://dbc:dbc@localhost:5434/celery')
 
 res_backend = os.environ.get("CELERY_RESULT_BACKEND",
                              "db+mariadb://dbc:dbc@localhost:5434/celery")

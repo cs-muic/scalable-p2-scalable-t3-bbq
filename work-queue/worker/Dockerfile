@@ -1,15 +1,16 @@
-# Build upon this image "alpine" is a lightweight distro
-FROM python:3.9
+FROM python:3.10-slim
 
-# Copy requirements.txt
-COPY ./requirements.txt /app/requirements.txt
+WORKDIR /usr/src/
 
-# Install all the requirements
-RUN pip install -r /app/requirements.txt
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Copy everthing from . to /app inside the 'box'
-COPY . /app
-WORKDIR /app
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 
-# How to run it when we start up the box?
-CMD ["./test.py"]
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
+
+
+COPY ./wq_service.py .

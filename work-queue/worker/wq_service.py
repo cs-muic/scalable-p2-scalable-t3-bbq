@@ -1,5 +1,7 @@
 from celery.result import AsyncResult
-from worker import extract, compose
+
+import compose
+import extract
 
 
 def issue_tasks(worker, tasks):
