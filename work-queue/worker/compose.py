@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 from celery import Celery
 import shutil
+import string
+import random
 
 BROKER_URL = os.environ.get("CELERY_BROKER_URL",
                             "redis://localhost:6378/0"),
@@ -34,15 +36,13 @@ if not found:
 
 
 @celery_app.task
-def to_gif(fp_out):
-
-    bucket_name = "039p2zot4j"
+def to_gif(bucket_name):
 
     frames = MINIO_CLIENT.list_objects(bucket_name=bucket_name, prefix="frame")
 
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
 
-    os.mkdir(bucket_name)
+    # os.mkdir(bucket_name)
     for obj in frames:
         fp = bucket_name + "/" + obj.object_name
         MINIO_CLIENT.fget_object(bucket_name=bucket_name, object_name=obj.object_name, file_path=fp)
@@ -52,6 +52,9 @@ def to_gif(fp_out):
     imgs = (Image.open(f) for f in sorted(glob.glob(frames)))
     img = next(imgs)  # extract first image from iterator
 
+    s = 10
+    fp_out = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
+
     img.save(fp=fp_out, format='GIF', append_images=imgs,
              save_all=True, duration=1 / 15, loop=0)
 
@@ -60,8 +63,10 @@ def to_gif(fp_out):
     os.remove(fp_out)
     shutil.rmtree(bucket_name)
 
+    print("Video Thumbnail Created!!!")
 
-if __name__ == '__main__':
-    fp_out = sys.argv[1]
-    # fp_in = sys.argv[2]
-    to_gif(fp_out)
+
+# if __name__ == '__main__':
+#     fp_out = sys.argv[1]
+#     # fp_in = sys.argv[2]
+#     to_gif(fp_out)
