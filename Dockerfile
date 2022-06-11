@@ -16,3 +16,5 @@ RUN pip install -r requirements.txt
 RUN chmod +x vid2gif.py
 
 RUN mkdir "/images"
+
+docker run -v "C:/Users/NEXT COMPUTER/Desktop/ScalableCS/scalable-p2-scalable-t3-bbq:/togif" p2 python vid2gif.py test3.mp output.gif

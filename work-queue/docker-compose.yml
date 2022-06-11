@@ -1,0 +1,30 @@
+version: "3"
+services:
+    broker:
+        image: redis:latest
+        container_name: demo_broker
+        ports:
+          - "6378:6379"
+
+    backend:
+        image: postgres:latest
+        container_name: demo_result
+        ports:
+          - "5434:5432"
+        environment:
+          - POSTGRES_USER=dbc
+          - POSTGRES_PASSWORD=dbc
+          - POSTGRES_DB=celery
+
+    worker:
+        build: .
+        container_name: demo_worker
+        command: celery --app=tasks.celery_app worker --loglevel=info
+        volumes:
+          - .:/usr/src
+        environment:
+          - CELERY_BROKER_URL=redis://broker:6379/0
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+        depends_on:
+          - broker
+          - backend
