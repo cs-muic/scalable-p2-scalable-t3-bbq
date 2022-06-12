@@ -13,4 +13,5 @@ RUN pip install -r requirements.txt
 RUN mkdir -p /usr/src/worker
 COPY ./worker /usr/src/worker
 
-CMD python ./backend.py
+CMD python backend.py &
+#CMD python wq_service.py

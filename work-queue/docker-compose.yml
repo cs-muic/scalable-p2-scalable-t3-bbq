@@ -33,11 +33,13 @@ services:
           - POSTGRES_DB=celery
 
     worker_01:
-        build: .
+        build:
+          context: .
+          dockerfile: worker/extract-w/Dockerfile
         container_name: extract
         command: celery --app=extract.celery_app worker --loglevel=info --queues q01
         volumes:
-          - .:/usr/src
+          - ./worker:/usr/src
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
@@ -50,11 +52,13 @@ services:
           - minio
 
     worker_02:
-        build: .
+        build:
+          context: .
+          dockerfile: worker/compose-w/Dockerfile
         container_name: compose
         command: celery --app=compose.celery_app worker --loglevel=info --queues q02
         volumes:
-          - .:/usr/src
+          - ./worker:/usr/src
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
@@ -67,8 +71,8 @@ services:
           - minio
 
     web-controller:
-        image: python:3.9
-        build: ..
+        build: .
+        restart: always
         container_name: web-controller
         volumes:
           - ./:/usr/src

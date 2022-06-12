@@ -14,7 +14,7 @@ BROKER_URL = os.environ.get("CELERY_BROKER_URL",
 RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
                              "db+postgresql://dbc:dbc@localhost:5434/celery")
 
-celery_app = Celery('extract', broker=BROKER_URL,
+celery_app = Celery('wq-service', broker=BROKER_URL,
                     backend=RES_BACKEND)
 
 load_dotenv()
