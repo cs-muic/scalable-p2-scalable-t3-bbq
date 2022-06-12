@@ -15,7 +15,7 @@ from celery import Celery
 BROKER_URL = os.environ.get("CELERY_BROKER_URL",
                             "redis://localhost:6378/0"),
 RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
-                             "db+postgresql://dbc:dbc@localhost:5434/celery")
+                             "db+postgresql://postgres:dbc@localhost:5434/celery")
 
 celery_app = Celery('extract', broker=BROKER_URL,
                     backend=RES_BACKEND)
@@ -30,6 +30,7 @@ MINIO_API_HOST = "http://localhost:9000"
 MINIO_URL = os.environ.get("MINIO_URL")
 
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+# MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
 # generate bucket of videos
 found = MINIO_CLIENT.bucket_exists("videos")

@@ -70,12 +70,29 @@ services:
           - backend
           - minio
 
+    wq_service:
+      build:
+        context: .
+        dockerfile: worker/compose-w/Dockerfile
+      container_name: compose
+      volumes:
+        - ./worker:/usr/src
+      environment:
+        - CELERY_BROKER_URL=redis://broker:6379/0
+        - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+        - MINIO_URL=minio-name:9000
+        - MINIO_ACCESS_KEY=admin
+        - MINIO_SECRET_KEY=password
+      depends_on:
+        - broker
+        - backend
+        - minio
+
     web-controller:
         build: .
-        restart: always
         container_name: web-controller
-        volumes:
-          - ./:/usr/src
+#        volumes:
+#          - ./:/usr/src
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery

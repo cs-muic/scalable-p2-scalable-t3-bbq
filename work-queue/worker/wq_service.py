@@ -12,7 +12,7 @@ import extract
 BROKER_URL = os.environ.get("CELERY_BROKER_URL",
                             "redis://localhost:6378/0"),
 RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
-                             "db+postgresql://dbc:dbc@localhost:5434/celery")
+                             "db+postgresql://postgres:dbc@localhost:5434/celery")
 
 celery_app = Celery('wq-service', broker=BROKER_URL,
                     backend=RES_BACKEND)
@@ -26,6 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 MINIO_API_HOST = "http://localhost:9000"
 MINIO_URL = os.environ.get("MINIO_URL")
 
+# CHANGE to MINIOURL
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
 

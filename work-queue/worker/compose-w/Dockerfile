@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
-COPY ./worker/compose-w/compose.py .
+#COPY ./worker/compose-w/compose.py .
 RUN pip install -r requirements.txt
 
 COPY ./worker/wq_service.py .
