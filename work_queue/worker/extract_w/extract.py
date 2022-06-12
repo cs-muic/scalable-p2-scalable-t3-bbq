@@ -8,6 +8,7 @@ from minio import Minio
 from dotenv import load_dotenv
 
 from celery import Celery
+from work_queue.worker.compose_w import compose
 
 # BROKER_URL = "redis://localhost:6378"
 # RES_BACKEND = "db+postgresql://postgres:dbc@localhost:5434/celery"
@@ -71,6 +72,9 @@ def get_frames(fp_in):
 
     os.rmdir("images")
     print("Successfully uploaded all frames to bucket")
+
+    compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})
+
     return randstr
 
 

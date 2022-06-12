@@ -1,5 +1,25 @@
 from flask import Flask
-from worker import wq_service
+from celery import Celery
+from celery.result import AsyncResult
+from dotenv import load_dotenv
+from minio import Minio
+import os
+
+from work_queue.worker.extract_w import extract
+from work_queue.worker.compose_w import compose
+
+load_dotenv()
+
+LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
+ACCESS_KEY = os.environ.get('ACCESS_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+MINIO_API_HOST = "http://localhost:9000"
+MINIO_URL = os.environ.get("MINIO_URL")
+
+# CHANGE to MINIOURL
+MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+
 
 app = Flask(__name__)
 
@@ -12,8 +32,8 @@ def index():
 
 # submit jobs to the queue
 @app.route('/convert', methods=['GET'])
-def convert():
-    wq_service.add_to_eq("./test3.mp4")
+def convert(video):
+    extract.celery_app.send_task('extract.get_frames', queue='q01', kwargs={'fp_in': video})
     return 'wtf'
 
 
@@ -24,12 +44,13 @@ def convert_all():
 
 @app.route('/list-gif')
 def list_gif():
-    return wq_service.list_gif()
+    return MINIO_CLIENT.list_objects(bucket_name=gif)
 
 
 @app.route('/track')
-def track():
-    return
+def track(tid):
+    task_result = AsyncResult(tid)
+    return task_result.result
 
 
 if __name__ == "__main__":
