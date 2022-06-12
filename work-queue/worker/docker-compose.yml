@@ -65,3 +65,22 @@ services:
           - broker
           - backend
           - minio
+
+    web-controller:
+        image: python:3.9
+        build: ..
+        container_name: web-controller
+        volumes:
+          - ./:/usr/src
+        environment:
+          - CELERY_BROKER_URL=redis://broker:6379/0
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
+        ports:
+          - "5000:5000"
+        depends_on:
+          - broker
+          - backend
+          - minio

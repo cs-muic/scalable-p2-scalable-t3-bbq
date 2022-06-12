@@ -15,3 +15,4 @@ RUN pip install -r requirements.txt
 
 
 COPY ./wq_service.py .
+COPY ../backend.py .
