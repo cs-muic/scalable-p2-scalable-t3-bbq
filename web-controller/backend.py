@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import jsonify, request, Flask
 from celery import Celery
 from celery.result import AsyncResult
 from dotenv import load_dotenv
@@ -32,7 +32,8 @@ def index():
 
 # submit jobs to the queue
 @app.route('/convert', methods=['POST'])
-def convert(video):
+def convert():
+    video = request.json["video"]
     extract.celery_app.send_task('extract.get_frames', queue='q01', kwargs={'fp_in': video})
     return 'wtf'
 
