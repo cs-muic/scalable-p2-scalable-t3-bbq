@@ -31,7 +31,7 @@ def index():
 
 
 # submit jobs to the queue
-@app.route('/convert', methods=['GET'])
+@app.route('/convert', methods=['POST'])
 def convert(video):
     extract.celery_app.send_task('extract.get_frames', queue='q01', kwargs={'fp_in': video})
     return 'wtf'
@@ -44,7 +44,7 @@ def convert_all():
 
 @app.route('/list-gif')
 def list_gif():
-    return MINIO_CLIENT.list_objects(bucket_name=gif)
+    return MINIO_CLIENT.list_objects(bucket_name='gif')
 
 
 @app.route('/track')

@@ -9,5 +9,3 @@ RUN pip install --upgrade pip
 COPY ./worker/compose_w/requirements.txt .
 COPY ./worker/compose_w/compose.py .
 RUN pip install -r requirements.txt
-
-#COPY ./worker/wq_service.py .

@@ -39,10 +39,10 @@ services:
         container_name: extract
         command: celery --app=extract.celery_app worker --loglevel=info --queues q01
         volumes:
-          - ./worker/extract_w:/usr/src
+          - ./work_queue:/usr/src/work_queue
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
-          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@web-controller:5432/celery
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
           - MINIO_URL=minio-name:9000
           - MINIO_ACCESS_KEY=admin
           - MINIO_SECRET_KEY=password
@@ -58,10 +58,10 @@ services:
         container_name: compose
         command: celery --app=compose.celery_app worker --loglevel=info --queues q02
         volumes:
-          - ./worker/compose_w:/usr/src
+          - ./work_queue:/usr/src/work_queue
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
-          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@web-controller:5432/celery
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
           - MINIO_URL=minio-name:9000
           - MINIO_ACCESS_KEY=admin
           - MINIO_SECRET_KEY=password
@@ -70,32 +70,14 @@ services:
           - backend
           - minio
 
-#    wq_service:
-#      build:
-#        context: work_queue
-#        dockerfile: worker/Dockerfile
-#      container_name: queue
-#      # volumes:
-#      #   - ./worker:/usr/src
-#      environment:
-#        - CELERY_BROKER_URL=redis://broker:6379/0
-#        - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@web-controller:5432/celery
-#        - MINIO_URL=minio-name:9000
-#        - MINIO_ACCESS_KEY=admin
-#        - MINIO_SECRET_KEY=password
-#      depends_on:
-#        - broker
-#        - backend
-#        - minio
-
     web-controller:
         build:
           context: .
-          dockerfile: web-controller
+          dockerfile: web-controller/Dockerfile
         container_name: web-controller
         volumes:
-          - .:/usr/src
-        command: python /usr/src/web-controller/backend.py
+          - ./work_queue:/usr/src/work_queue
+        command: python backend.py
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@web-controller:5432/celery

@@ -1,16 +1,16 @@
 FROM python:3.9-slim
 
-WORKDIR /usr/src/
+WORKDIR /usr/src
 
 
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 
-ADD ../ .
+#ADD ../ .
 
 RUN pip install --upgrade pip
-COPY requirements.txt .
-COPY ./backend.py .
+COPY ./web-controller/requirements.txt .
+COPY ./web-controller/backend.py .
 
 RUN pip install -r requirements.txt
 

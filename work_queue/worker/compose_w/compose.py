@@ -1,6 +1,5 @@
 import glob
 from PIL import Image
-import sys
 from minio import Minio
 from dotenv import load_dotenv
 import os
@@ -14,7 +13,8 @@ BROKER_URL = os.environ.get("CELERY_BROKER_URL",
 RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
                              "db+postgresql://postgres:dbc@localhost:5434/celery")
 
-celery_app = Celery('compose', broker=BROKER_URL, backend=RES_BACKEND)
+celery_app = Celery('compose', broker=BROKER_URL,
+                    backend=RES_BACKEND)
 
 load_dotenv()
 
@@ -22,12 +22,11 @@ LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
 ACCESS_KEY = os.environ.get('ACCESS_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# MINIO_API_HOST = "http://localhost:9000"
-
+MINIO_API_HOST = "http://localhost:9000"
 MINIO_URL = os.environ.get("MINIO_URL")
 
-# MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
+# MINIO_CLIENT = Minio("localhost:9000", access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
 # generate bucket of GIF
 found = MINIO_CLIENT.bucket_exists("gif")
