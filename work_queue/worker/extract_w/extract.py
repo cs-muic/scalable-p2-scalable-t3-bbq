@@ -24,10 +24,10 @@ celery_app = Celery('extract', broker=BROKER_URL,
 load_dotenv()
 
 LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
-ACCESS_KEY = os.environ.get('ACCESS_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY')
+ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
+SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
-MINIO_API_HOST = "http://localhost:9000"
+# MINIO_API_HOST = "http://localhost:9000"
 MINIO_URL = os.environ.get("MINIO_URL")
 
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
@@ -37,7 +37,6 @@ MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, se
 found = MINIO_CLIENT.bucket_exists("videos")
 if not found:
     MINIO_CLIENT.make_bucket("videos")
-
 
 @celery_app.task
 def get_frames(fp_in):

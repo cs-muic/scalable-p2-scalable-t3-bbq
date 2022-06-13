@@ -11,10 +11,10 @@ from work_queue.worker.compose_w import compose
 load_dotenv()
 
 LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
-ACCESS_KEY = os.environ.get('ACCESS_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY')
+ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
+SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
-MINIO_API_HOST = "http://localhost:9000"
+# MINIO_API_HOST = "http://localhost:9000"
 MINIO_URL = os.environ.get("MINIO_URL")
 
 # CHANGE to MINIOURL

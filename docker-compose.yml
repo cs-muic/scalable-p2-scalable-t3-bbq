@@ -50,6 +50,10 @@ services:
           - broker
           - backend
           - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
 
     worker_02:
         build:
@@ -69,6 +73,10 @@ services:
           - broker
           - backend
           - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
 
     web-controller:
         build:
@@ -90,3 +98,7 @@ services:
           - broker
           - backend
           - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
