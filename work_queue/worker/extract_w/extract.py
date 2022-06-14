@@ -40,7 +40,9 @@ if not found:
 
 
 @celery_app.task
-def get_frames(video, bucket):
+def get_frames(video, bucket, self):
+    self.update_state(state='STARTED')
+
     # generate bucket of frames extracted
     s = 10  # number of characters in the string.
     randstr = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
@@ -60,6 +62,7 @@ def get_frames(video, bucket):
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
     success, image = vidcap.read()
     count = 0
+
     while success:
         if 1 / 3 * length < count < 1 / 3 * length + 15 * 15:
             frame = imutils.resize(image, width=480)

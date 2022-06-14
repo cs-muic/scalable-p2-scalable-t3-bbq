@@ -35,7 +35,8 @@ if not found:
 
 
 @celery_app.task
-def to_gif(bucket_name):
+def to_gif(bucket_name, self):
+    self.update_state(state='STARTED')
 
     frames = MINIO_CLIENT.list_objects(bucket_name=bucket_name, prefix="frame")
 

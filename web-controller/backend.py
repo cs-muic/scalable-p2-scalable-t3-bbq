@@ -119,7 +119,6 @@ def track():
                 db.session.commit()
             except:
                 db.session.rollback()
-            # cq.append(res.result)
         if task.task_type == "extract" and res.result not in cq:
             eq.append(task.task_id)
         elif task.task_type == "compose" and task.task_id not in cq:
@@ -134,11 +133,15 @@ def track():
     if tid not in eq and tid not in cq:
         return obj
     else:
+        if tid in eq:
+            process = "Extract: "
+        else:
+            process = "Compose: "
         task_result = AsyncResult(tid)
-        return task_result.state
+        return process + " " + task_result.state
 
 
 if __name__ == "__main__":
-    from waitress import serve
 
+    from waitress import serve
     serve(app, host="0.0.0.0", port=5000)
