@@ -38,8 +38,9 @@ found = MINIO_CLIENT.bucket_exists("videos")
 if not found:
     MINIO_CLIENT.make_bucket("videos")
 
+
 @celery_app.task
-def get_frames(fp_in):
+def get_frames(video, bucket):
     # generate bucket of frames extracted
     s = 10  # number of characters in the string.
     randstr = ''.join(random.choices(string.ascii_lowercase + string.digits, k=s))
@@ -49,9 +50,12 @@ def get_frames(fp_in):
     else:
         print("Bucket already exists")
 
-    MINIO_CLIENT.fput_object("videos", object_name=os.path.basename(fp_in), file_path=fp_in)
+    # MINIO_CLIENT.fput_object("videos", object_name=os.path.basename(fp_in), file_path=fp_in)
+
+    MINIO_CLIENT.fget_object(bucket_name=bucket, object_name=video, file_path=video)
+
     os.mkdir("images")
-    vidcap = cv2.VideoCapture(fp_in)
+    vidcap = cv2.VideoCapture(video)
     # fps = vidcap.get(cv2.CAP_PROP_FPS)
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
     success, image = vidcap.read()
@@ -70,6 +74,7 @@ def get_frames(fp_in):
         count += 1
 
     os.rmdir("images")
+    os.remove(video)
     print("Successfully uploaded all frames to bucket")
 
     task = compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})
