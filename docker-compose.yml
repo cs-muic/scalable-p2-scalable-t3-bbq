@@ -90,6 +90,7 @@ services:
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
           - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - RESULT_BACKEND=postgresql://dbc:dbc@backend:5432/jobs
           - MINIO_URL=minio-name:9000
           - MINIO_ACCESS_KEY=admin
           - MINIO_SECRET_KEY=password
