@@ -3,6 +3,7 @@ services:
     minio:
         image: minio/minio
         command: server /data --console-address ":9001"
+        container_name: minio
         hostname: minio-name
         ports:
           - "9000:9000"
@@ -88,7 +89,7 @@ services:
         command: python backend.py
         environment:
           - CELERY_BROKER_URL=redis://broker:6379/0
-          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@web-controller:5432/celery
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
           - MINIO_URL=minio-name:9000
           - MINIO_ACCESS_KEY=admin
           - MINIO_SECRET_KEY=password

@@ -72,9 +72,9 @@ def get_frames(fp_in):
     os.rmdir("images")
     print("Successfully uploaded all frames to bucket")
 
-    compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})
+    task = compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})
 
-    return randstr
+    return task.task_id
 
 
 if __name__ == '__main__':
