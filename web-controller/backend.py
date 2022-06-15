@@ -1,23 +1,24 @@
+import base64
 import json
 
-from flask import request, Flask
+from flask import request, Flask, render_template, send_file
 from celery.result import AsyncResult
 from flask_sqlalchemy import SQLAlchemy
 from minio import Minio
 from sqlalchemy_utils import create_database, database_exists
 import os
 
-import extract
+from werkzeug.utils import secure_filename
+
+from work_queue.worker.extract_w import extract
 
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
 MINIO_URL = os.environ.get("MINIO_URL")
-
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
-url = "postgresql://" + os.environ["POSTGRES_USER"] + ":" + os.environ[
-    "POSTGRES_PASSWORD"] + "@" + os.environ["POSTGRES_DB"] + "/jobs"
+url = os.environ.get("RESULT_BACKEND")
 if not database_exists(url):
     create_database(url)
 
@@ -38,15 +39,25 @@ db.create_all()
 
 @app.route('/')
 def index():
-    # return "Hello Video Thumbnailer!!"
-    return 'f'
+    return controller()
 
 
-@app.route('/make-bucket', methods=['POST'])
+@app.route('/controller', methods=['GET'])
+def controller():
+    return render_template('controller.html')
+
+
+@app.route('/display')
+def display():
+    return list_gif()
+
+
+@app.route('/make-bucket', methods=['GET', 'POST'])
 def make_bucket():
-    bucket_name = request.json["bucket_name"]
+    bucket_name = request.form['newbucket']
     MINIO_CLIENT.make_bucket(bucket_name)
-    return "Bucket " + bucket_name + " created"
+    # return "Bucket " + bucket_name + " created"
+    return render_template('controller.html')
 
 
 @app.route('/list-buckets', methods=['GET'])
@@ -55,25 +66,36 @@ def list_buckets():
     for bucket in MINIO_CLIENT.list_buckets():
         ret.append(bucket.name)
     return json.dumps(list(ret))
+    # return render_template('controller.html')
 
 
-@app.route('/put-video', methods=['POST'])
+@app.route('/put-video', methods=['GET', 'POST'])
 def put_video():
-    bucket_name = request.form['request']
+    bucket_name = request.form['bucket']
+
+    if bucket_name == "":
+        bucket_name = "videos"
+
     f = request.files['file']
-    f.save(f.filename)
+    f.save(secure_filename(f.filename))
     MINIO_CLIENT.fput_object(bucket_name=bucket_name, object_name=f.filename, file_path=f.filename,
                              content_type=f.content_type)
     os.remove(f.filename)
-    # MINIO_CLIENT.put_object(bucket_name=bucket_name, object_name=f.name, data=f.stream, content_type=f.content_type, length=f.content_length)
-    return 'file uploaded successfully'
+    return render_template('controller.html')
 
 
 # submit jobs to the queue
-@app.route('/convert', methods=['POST'])
+@app.route('/convert', methods=['GET', 'POST'])
 def convert():
-    video = request.json["video"]
-    bucket = request.json["bucket_name"]
+    video = request.form["video"]
+    bucket = request.form["bucket"]
+
+    if bucket == "":
+        bucket = "videos"
+
+    if not MINIO_CLIENT.bucket_exists(bucket):
+        return "Bucket does not exist"
+
     task = extract.celery_app.send_task('extract.get_frames', queue='q01', kwargs={'video': video, 'bucket': bucket})
     new = Task(task_id=task.task_id, task_type="extract")
     db.session.add(new)
@@ -81,33 +103,47 @@ def convert():
         db.session.commit()
     except:
         db.session.rollback()
-    return "Converting"
+    # return "Converting"
+    return render_template('controller.html')
 
 
-@app.route('/convert-bucket', methods=['POST'])
+@app.route('/convert-bucket', methods=['GET', 'POST'])
 def convert_all():
-    bucket_name = request.json["bucket_name"]
+    bucket_name = request.form["bucket"]
+
+    if bucket_name == "":
+        bucket_name = "videos"
+
+    if not MINIO_CLIENT.bucket_exists(bucket_name):
+        return "Bucket does not exist"
+
     all_vid = MINIO_CLIENT.list_objects(bucket_name=bucket_name)
     for vid in all_vid:
         MINIO_CLIENT.fget_object(bucket_name=bucket_name, object_name=vid.object_name, file_path=vid.object_name)
-        task = extract.celery_app.send_task('extract.get_frames', queue='q01', kwargs={'fp_in': vid.object_name})
+        task = extract.celery_app.send_task('extract.get_frames', queue='q01',
+                                            kwargs={'video': vid.object_name, 'bucket': bucket_name})
         new = Task(task_id=task.task_id, task_type="extract")
         db.session.add(new)
         try:
             db.session.commit()
         except:
             db.session.rollback()
-    return "Converting all videos inside the bucket"
+    # return "Converting all videos inside the bucket"
+    return render_template('controller.html')
 
 
-@app.route('/list-gif')
+@app.route('/list-gif', methods=['GET'])
 def list_gif():
+    all_gif = []
+    obj_names = []
     for obj in MINIO_CLIENT.list_objects(bucket_name='gif'):
-        MINIO_CLIENT.fget_object(bucket_name='gif', object_name=obj.object_name, file_path=obj.object_name)
-    return 'f'
+        gif = MINIO_CLIENT.get_object(bucket_name='gif', object_name=obj.object_name)
+        all_gif.append(base64.b64encode(gif.read()).decode('utf-8'))
+        obj_names.append(obj.object_name)
+    return render_template('display.html', all_gif=all_gif, obj_names=obj_names, len=len(obj_names))
 
 
-@app.route('/track', methods=['POST'])
+@app.route('/track', methods=['GET', 'POST'])
 def track():
     eq = []
     cq = []
@@ -126,9 +162,9 @@ def track():
             cq.append(task.task_id)
     obj = json.dumps({"extract_q": eq, "compose_q": cq})
 
-    try:
-        tid = request.json["tid"]
-    except:
+    tid = request.form["tid"]
+
+    if tid == "":
         return obj
 
     if tid not in eq and tid not in cq:
@@ -142,7 +178,21 @@ def track():
         return process + " " + task_result.state
 
 
-if __name__ == "__main__":
+@app.route('/delete-all', methods=['POST'])
+def delete_all():
+    for obj in MINIO_CLIENT.list_objects(bucket_name='gif'):
+        MINIO_CLIENT.remove_object(bucket_name='gif', object_name=obj.object_name)
+    return list_gif()
 
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    obj = request.form["delete_obj"]
+    MINIO_CLIENT.remove_object(bucket_name='gif', object_name=obj)
+    return list_gif()
+
+
+if __name__ == "__main__":
     from waitress import serve
+
     serve(app, host="0.0.0.0", port=5000)
