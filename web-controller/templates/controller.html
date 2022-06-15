@@ -10,7 +10,7 @@
 </div>
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <p>Put a video into the bucket</p>
+    <p>Put a video into the bucket (default bucket = videos)</p>
     <form action="http://localhost/put-video" enctype="multipart/form-data" method="POST">
         <p>Video file <input type="file" name="file"/></p>
         <p>Bucket name <input type="text" name="bucket" placeholder="bucket name"/></p>
@@ -19,9 +19,9 @@
 </div>
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <p>Convert</p>
+    <p>Convert (default bucket = videos)</p>
     <form action="http://localhost/convert" method="POST">
-        <p>Video <input type="text" name="video"/></p>
+        <p>Video filename<input type="text" name="video"/></p>
         <p>Bucket name <input type="text" name="bucket" placeholder="bucket name"/></p>
         <input type="submit" name="convert" value="convert">
     </form>
@@ -29,7 +29,7 @@
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
     <form action="http://localhost/convert-bucket" method="POST">
-        <p>Convert all videos in the bucket <input type="text" name="bucket" placeholder="bucket name"/><input
+        <p>Convert all videos in the bucket (default bucket = videos) <input type="text" name="bucket" placeholder="bucket name"/><input
                 type="submit"
                 name="convert_all"
                 value="convert all">
