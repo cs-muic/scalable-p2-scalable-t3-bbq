@@ -18,7 +18,8 @@ SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 MINIO_URL = os.environ.get("MINIO_URL")
 MINIO_CLIENT = Minio(MINIO_URL, access_key=ACCESS_KEY, secret_key=SECRET_KEY, secure=False)
 
-url = os.environ.get("RESULT_BACKEND")
+url = "postgresql://" + os.environ["POSTGRES_USER"] + ":" + os.environ[
+    "POSTGRES_PASSWORD"] + "@" + os.environ["POSTGRES_DB"] + "/jobs"
 if not database_exists(url):
     create_database(url)
 
