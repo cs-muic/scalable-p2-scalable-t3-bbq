@@ -73,7 +73,7 @@ def get_frames(video, bucket):
         success, image = vidcap.read()
         count += 1
 
-    os.remove(video)
+
     print("Successfully uploaded all frames to bucket")
 
     task = compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})
