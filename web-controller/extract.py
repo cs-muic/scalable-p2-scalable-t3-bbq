@@ -5,7 +5,6 @@ import string
 import random
 import os
 from minio import Minio
-from dotenv import load_dotenv
 
 from celery import Celery
 import compose
@@ -21,9 +20,7 @@ RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
 celery_app = Celery('extract', broker=BROKER_URL,
                     backend=RES_BACKEND)
 
-load_dotenv()
 
-LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
@@ -76,8 +73,6 @@ def get_frames(video, bucket, self):
         success, image = vidcap.read()
         count += 1
 
-    os.rmdir("images")
-    os.remove(video)
     print("Successfully uploaded all frames to bucket")
 
     task = compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})

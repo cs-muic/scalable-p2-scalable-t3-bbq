@@ -12,6 +12,7 @@ COPY ./web-controller/requirements.txt .
 COPY ./web-controller/backend.py .
 COPY ./web-controller/extract.py .
 COPY ./web-controller/compose.py .
+COPY ./web-controller/templates ./templates
 
 RUN pip install -r requirements.txt
 
