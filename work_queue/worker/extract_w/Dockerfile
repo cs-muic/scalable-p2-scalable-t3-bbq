@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-WORKDIR /usr/src/
+WORKDIR /usr/src/work_queue/worker
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -10,6 +10,6 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN pip install --upgrade pip
 COPY ./work_queue/worker/extract_w/requirements.txt .
-COPY ./work_queue/worker/extract_w/extract.py .
-COPY ./work_queue/worker/compose_w/compose.py .
+COPY ./work_queue/worker/extract_w/extract.py ./extract_w
+COPY ./work_queue/worker/compose_w/compose.py ./compose_w
 RUN pip install -r requirements.txt
