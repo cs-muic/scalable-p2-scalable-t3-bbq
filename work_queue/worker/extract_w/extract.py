@@ -51,7 +51,7 @@ def get_frames(video, bucket):
 
     MINIO_CLIENT.fget_object(bucket_name=bucket, object_name=video, file_path=video)
 
-    if not os.path.exists():
+    if not os.path.exists("images"):
         os.mkdir("images")
 
     vidcap = cv2.VideoCapture(video)

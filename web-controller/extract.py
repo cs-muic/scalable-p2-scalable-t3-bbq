@@ -20,7 +20,7 @@ RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
 celery_app = Celery('extract', broker=BROKER_URL,
                     backend=RES_BACKEND)
 
-
+LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
@@ -37,8 +37,8 @@ if not found:
 
 
 @celery_app.task
-def get_frames(video, bucket, self):
-    self.update_state(state='STARTED')
+def get_frames(video, bucket):
+    # self.update_state(state='STARTED')
 
     # generate bucket of frames extracted
     s = 10  # number of characters in the string.
@@ -49,11 +49,11 @@ def get_frames(video, bucket, self):
     else:
         print("Bucket already exists")
 
-    # MINIO_CLIENT.fput_object("videos", object_name=os.path.basename(fp_in), file_path=fp_in)
-
     MINIO_CLIENT.fget_object(bucket_name=bucket, object_name=video, file_path=video)
 
-    os.mkdir("images")
+    if not os.path.exists("images"):
+        os.mkdir("images")
+
     vidcap = cv2.VideoCapture(video)
     # fps = vidcap.get(cv2.CAP_PROP_FPS)
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -62,7 +62,7 @@ def get_frames(video, bucket, self):
 
     while success:
         if 1 / 3 * length < count < 1 / 3 * length + 15 * 15:
-            frame = imutils.resize(image, width=480)
+            frame = imutils.resize(image, width=360)
             cv2.imwrite("images/frame%d.png" % count, frame)
             MINIO_CLIENT.fput_object(randstr, object_name="frame%d.png" % count,
                                      file_path="images/frame%d.png" % count, content_type="image/png")
@@ -73,6 +73,7 @@ def get_frames(video, bucket, self):
         success, image = vidcap.read()
         count += 1
 
+    os.remove(video)
     print("Successfully uploaded all frames to bucket")
 
     task = compose.celery_app.send_task('compose.to_gif', queue='q02', kwargs={'bucket_name': randstr})

@@ -25,7 +25,7 @@ spec:
           - name: POSTGRES_PASSWORD
             value: dbc
           - name: POSTGRES_DB
-            value: myname
+            value: celery
         volumeMounts:
            - mountPath: /var/lib/postgres/data
              name: postgresdata

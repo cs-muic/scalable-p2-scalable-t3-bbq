@@ -58,12 +58,12 @@ spec:
             port:
               number: 80
       - path: /make-bucket
-          pathType: Exact
-          backend:
-            service:
-              name: controller
-              port:
-                number: 80
+        pathType: Exact
+        backend:
+          service:
+            name: controller
+            port:
+              number: 80
       - path: /list-buckets
         pathType: Exact
         backend:
