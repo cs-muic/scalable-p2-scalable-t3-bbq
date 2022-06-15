@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: redis
-    image: redis:5.0.4
+    image: redis:latest
     command:
       - redis-server
       - "/redis-master/redis.conf"
@@ -13,7 +13,7 @@ spec:
     - name: MASTER
       value: "true"
     ports:
-    - containerPort: 6379
+      - containerPort: 6379
     resources:
       limits:
         cpu: "0.1"
@@ -27,7 +27,7 @@ spec:
       emptyDir: {}
     - name: config
       configMap:
-        name: test-redis-config
+        name: redis-config
         items:
         - key: redis-config
           path: redis.conf
