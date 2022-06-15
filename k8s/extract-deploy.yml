@@ -20,9 +20,9 @@ spec:
         command: ['celery', '--app', 'extract', 'worker', '-l', 'INFO' , '--queues', 'q01']
         env:
           - name: CELERY_BROKER_URL
-            value: redis://broker:6379/0
+            value: redis://redis:6379/0
           - name: CELERY_RESULT_BACKEND
-            value: db+postgresql://dbc:dbc@backend:5432/celery
+            value: db+postgresql://dbc:dbc@postgres:5432/celery
           - name: MINIO_URL
             value: minio:9000
           - name: MINIO_ACCESS_KEY

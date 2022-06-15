@@ -3,7 +3,7 @@
 {% block content %}
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <form action="http://localhost:5000/make-bucket" method="POST">
+    <form action="http://localhost/make-bucket" method="POST">
         <p>Create a video bucket <input type="text" name="newbucket" placeholder="new bucket name"/>
             <input type="submit" name="create" value="create"></p>
     </form>
@@ -11,7 +11,7 @@
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
     <p>Put a video into the bucket</p>
-    <form action="http://localhost:5000/put-video" enctype="multipart/form-data" method="POST">
+    <form action="http://localhost/put-video" enctype="multipart/form-data" method="POST">
         <p>Video file <input type="file" name="file"/></p>
         <p>Bucket name <input type="text" name="bucket" placeholder="bucket name"/></p>
         <input type="submit" name="put" value="put">
@@ -20,7 +20,7 @@
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
     <p>Convert</p>
-    <form action="http://localhost:5000/convert" method="POST">
+    <form action="http://localhost/convert" method="POST">
         <p>Video <input type="text" name="video"/></p>
         <p>Bucket name <input type="text" name="bucket" placeholder="bucket name"/></p>
         <input type="submit" name="convert" value="convert">
@@ -28,7 +28,7 @@
 </div>
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <form action="http://localhost:5000/convert-bucket" method="POST">
+    <form action="http://localhost/convert-bucket" method="POST">
         <p>Convert all videos in the bucket <input type="text" name="bucket" placeholder="bucket name"/><input
                 type="submit"
                 name="convert_all"
@@ -38,13 +38,13 @@
 </div>
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <form action="http://localhost:5000/list-buckets" method="GET">
+    <form action="http://localhost/list-buckets" method="GET">
         <p><input type="submit" name="all_buckets" value="List all buckets"></p>
     </form>
 </div>
 
 <div style="padding: 10px; background-color:#e6f9ff; margin: 20px">
-    <form action="http://localhost:5000/track" method="POST">
+    <form action="http://localhost/track" method="POST">
         <p>Track (empty input to list all)<input type="text" name="tid" placeholder="Task ID"/><input type="submit"
                                                                                                       name="go"
                                                                                                       value="go"></p>

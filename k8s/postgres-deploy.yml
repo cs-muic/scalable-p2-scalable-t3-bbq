@@ -25,7 +25,7 @@ spec:
           - name: POSTGRES_PASSWORD
             value: dbc
           - name: POSTGRES_DB
-            value: backend:5432
+            value: myname
         volumeMounts:
            - mountPath: /var/lib/postgres/data
              name: postgresdata
