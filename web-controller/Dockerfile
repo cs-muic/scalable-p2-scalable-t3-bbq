@@ -10,7 +10,7 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 RUN pip install --upgrade pip
 COPY ./web-controller/requirements.txt .
 COPY ./web-controller/backend.py .
-COPY ./work_queue/worker/extract_w/extract.py ./work_queue/worker/extract_w
+COPY ./work_queue/worker/extract_w/extract.py .
 
 RUN pip install -r requirements.txt
 
