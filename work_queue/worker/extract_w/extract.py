@@ -8,7 +8,7 @@ from minio import Minio
 from dotenv import load_dotenv
 
 from celery import Celery
-from work_queue.worker.compose_w import compose
+import compose
 
 # BROKER_URL = "redis://localhost:6378"
 # RES_BACKEND = "db+postgresql://postgres:dbc@localhost:5434/celery"

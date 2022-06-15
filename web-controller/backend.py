@@ -7,7 +7,7 @@ from minio import Minio
 from sqlalchemy_utils import create_database, database_exists
 import os
 
-from work_queue.worker.extract_w import extract
+import extract
 
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
