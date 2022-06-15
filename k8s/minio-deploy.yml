@@ -13,6 +13,7 @@ spec:
       labels:
         app: minio
     spec:
+      hostname: minio
       volumes:
       - name: data
         persistentVolumeClaim:
@@ -34,7 +35,7 @@ spec:
         - name: MINIO_SECRET_KEY
           value: "password"
         ports:
-        - containerPort: 9000
+        - containerPort: 9001
         # readinessProbe:
         #   httpGet:
         #     path: /minio/health/ready
