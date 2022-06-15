@@ -10,8 +10,8 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN pip install --upgrade pip
 
-COPY ./requirements.txt .
-COPY ./extract.py .
-COPY ./compose.py .
+COPY ./work_queue/worker/extract_w/requirements.txt .
+COPY ./work_queue/worker/extract_w/extract.py .
+COPY ./work_queue/worker/extract_w/compose.py .
 
 RUN pip install -r requirements.txt
