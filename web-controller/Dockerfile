@@ -11,6 +11,7 @@ RUN pip install --upgrade pip
 COPY ./web-controller/requirements.txt .
 COPY ./web-controller/backend.py .
 COPY ./web-controller/extract.py .
+COPY ./web-controller/compose.py .
 
 RUN pip install -r requirements.txt
 
