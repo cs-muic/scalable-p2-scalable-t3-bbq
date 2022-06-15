@@ -1,7 +1,6 @@
 import glob
 from PIL import Image
 from minio import Minio
-from dotenv import load_dotenv
 import os
 from celery import Celery
 import shutil
@@ -16,9 +15,6 @@ RES_BACKEND = os.environ.get("CELERY_RESULT_BACKEND",
 celery_app = Celery('compose', broker=BROKER_URL,
                     backend=RES_BACKEND)
 
-load_dotenv()
-
-LOCAL_FILE_PATH = os.environ.get('LOCAL_FILE_PATH')
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
 
@@ -65,8 +61,3 @@ def to_gif(bucket_name, self):
 
     return "Video Thumbnail Created!!!"
 
-
-# if __name__ == '__main__':
-#     fp_out = sys.argv[1]
-#     # fp_in = sys.argv[2]
-#     to_gif(fp_out)

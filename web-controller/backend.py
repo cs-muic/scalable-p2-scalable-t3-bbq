@@ -1,7 +1,7 @@
 import base64
 import json
 
-from flask import request, Flask, render_template, send_file
+from flask import request, Flask, render_template
 from celery.result import AsyncResult
 from flask_sqlalchemy import SQLAlchemy
 from minio import Minio
