@@ -10,7 +10,7 @@ import os
 
 from werkzeug.utils import secure_filename
 
-from work_queue.worker.extract_w import extract
+import extract
 
 ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
 SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
