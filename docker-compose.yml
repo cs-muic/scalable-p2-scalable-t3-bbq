@@ -1,0 +1,106 @@
+version: "3"
+services:
+    minio:
+        image: minio/minio
+        command: server /data --console-address ":9001"
+        container_name: minio
+        hostname: minio-name
+        ports:
+          - "9000:9000"
+          - "9001:9001"
+        environment:
+           MINIO_ACCESS_KEY: admin
+           MINIO_SECRET_KEY: password
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+          interval: 30s
+          timeout: 20s
+          retries: 3
+
+    broker:
+        image: redis:latest
+        container_name: demo_broker
+        ports:
+          - "6378:6379"
+
+    backend:
+        image: postgres:latest
+        container_name: demo_result
+        ports:
+          - "5434:5432"
+        environment:
+          - POSTGRES_USER=dbc
+          - POSTGRES_PASSWORD=dbc
+          - POSTGRES_DB=celery
+
+    worker_01:
+        build:
+          context: work_queue
+          dockerfile: worker/extract_w/Dockerfile
+        container_name: extract
+        command: celery --app=extract.celery_app worker --loglevel=info --queues q01
+        volumes:
+          - ./work_queue:/usr/src/work_queue
+        environment:
+          - CELERY_BROKER_URL=redis://broker:6379/0
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
+        depends_on:
+          - broker
+          - backend
+          - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
+
+    worker_02:
+        build:
+          context: work_queue
+          dockerfile: worker/compose_w/Dockerfile
+        container_name: compose
+        command: celery --app=compose.celery_app worker --loglevel=info --queues q02
+        volumes:
+          - ./work_queue:/usr/src/work_queue
+        environment:
+          - CELERY_BROKER_URL=redis://broker:6379/0
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
+        depends_on:
+          - broker
+          - backend
+          - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
+
+    web-controller:
+        build:
+          context: .
+          dockerfile: web-controller/Dockerfile
+        container_name: web-controller
+        volumes:
+          - ./work_queue:/usr/src/work_queue
+        command: python backend.py
+        environment:
+          - CELERY_BROKER_URL=redis://broker:6379/0
+          - CELERY_RESULT_BACKEND=db+postgresql://dbc:dbc@backend:5432/celery
+          - RESULT_BACKEND=postgresql://dbc:dbc@backend:5432/jobs
+          - MINIO_URL=minio-name:9000
+          - MINIO_ACCESS_KEY=admin
+          - MINIO_SECRET_KEY=password
+        ports:
+          - "5000:5000"
+        depends_on:
+          - broker
+          - backend
+          - minio
+        healthcheck:
+          interval: 30s
+          timeout: 20s
+          retries: 3
