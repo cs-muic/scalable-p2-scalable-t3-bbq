@@ -3,6 +3,12 @@
 *.mp4
 *.xml
 .idea/
+test.py
+requirements.txt
+docker-compose.yml
+Dockerfile
+work_queue/demo
+
 =======
 # Default ignored files
 /shelf/
